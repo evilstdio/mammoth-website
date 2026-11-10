@@ -1,0 +1,144 @@
+---
+import Base from "../../layouts/Base.astro";
+import MamCode from "../../components/MamCode.astro";
+import { examples } from "../../data/examples";
+import { release, url } from "../../site";
+
+const hello = examples[0];
+// Everything below restates the "Install", "Build from source" and "VS Code"
+// sections of the compiler README.
+---
+
+<Base
+  title="Install"
+  section="install"
+  description={`Install Mammoth ${release.version} on Windows, or build it from source.`}
+>
+  <header class="page-head wrap">
+    <p class="page-kicker">Get started</p>
+    <h1>Install Mammoth</h1>
+    <p class="page-lede">
+      The Windows installer includes its own Java runtime, so you don't need
+      Java or Rust, and it doesn't need administrator rights.
+    </p>
+    <div class="download">
+      <a class="btn btn-primary btn-large" href={release.setup.url}>
+        Download for Windows
+      </a>
+      <p class="download-meta">
+        Mammoth {release.version} · 64-bit Windows · {release.setup.size}
+        <br />
+        or the <a href={release.zip.url}>portable zip</a> ({release.zip.size}) ·
+        <a href={release.page}>release notes</a>
+      </p>
+    </div>
+    <p class="status-note">
+      <strong>{release.status}.</strong> The language, its standard library and
+      the compiler's error messages may change between releases. The test
+      suites run on Windows with Java 17. Linux and macOS have not been tested.
+    </p>
+  </header>
+
+  <div class="steps wrap">
+    <section class="step" aria-labelledby="step-1">
+      <span class="step-num" aria-hidden="true">1</span>
+      <div>
+        <h2 id="step-1">Run the installer</h2>
+        <p>
+          Run <code>{release.setup.name}</code>. A setup window lets you pick
+          the install folder and choose whether to add Mammoth to
+          <code>PATH</code>. By default it installs for your user account in
+          <code>%LOCALAPPDATA%\Programs\Mammoth</code>, and you can uninstall it
+          from <strong>Settings → Apps</strong>.
+        </p>
+        <p>
+          Rather not run a setup program? Unzip the
+          <a href={release.zip.url}>portable zip</a> and double-click
+          <code>install.cmd</code> inside it, or run <code>bin\mammoth.exe</code>
+          straight from the folder.
+        </p>
+      </div>
+    </section>
+
+    <section class="step" aria-labelledby="step-2">
+      <span class="step-num" aria-hidden="true">2</span>
+      <div>
+        <h2 id="step-2">Check it works</h2>
+        <p>Open a new terminal, then run:</p>
+        <MamCode
+          lang="powershell"
+          code={'mammoth --version\nmammoth "$env:LOCALAPPDATA\\Programs\\Mammoth\\examples\\greet.mam"'}
+        />
+        <p>
+          This compiles and runs the example, which prints
+          <code>Hello, Maya!</code> and <code>Hello, Sam!</code>.
+        </p>
+      </div>
+    </section>
+
+    <section class="step" aria-labelledby="step-3">
+      <span class="step-num" aria-hidden="true">3</span>
+      <div>
+        <h2 id="step-3">Write your first program</h2>
+        <p>
+          Save this as <code>{hello.file}</code>, or
+          <a href={url(`examples/${hello.file}`)} download>download it</a>:
+        </p>
+        <MamCode code={hello.code} file={hello.file} />
+        <p>Then run it from the same folder:</p>
+        <MamCode lang="powershell" code={`mammoth ${hello.file}`} />
+        <p>
+          Next, take the <a href={url("tour/")}>language tour</a> or browse the
+          <a href={url("docs/")}>documentation</a>.
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <div class="install-more wrap">
+    <section aria-labelledby="vscode">
+      <h2 id="vscode">VS Code</h2>
+      <p>
+        Install the Mammoth Language VSIX with
+        <strong>Extensions → Install from VSIX</strong>, open a saved
+        <code>.mam</code> file, and use the play button or
+        <strong>Mammoth: Run Mammoth File</strong>. Compiler diagnostics appear
+        in the Problems panel.
+      </p>
+      <p>
+        The extension's source is in
+        <a href={`${release.repo}/tree/main/editors/vscode`}>editors/vscode</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="java">
+      <h2 id="java">Choosing a Java</h2>
+      <p>Mammoth uses the first Java it finds, in this order:</p>
+      <ol>
+        <li>the folder in <code>MAMMOTH_JAVA_HOME</code></li>
+        <li>the runtime installed with Mammoth</li>
+        <li><code>JAVA_HOME</code></li>
+        <li><code>java</code> on <code>PATH</code></li>
+      </ol>
+      <p>
+        Set <code>MAMMOTH_JAVA_HOME</code> to a JDK to use a different Java,
+        such as Java 21 for Minecraft mods.
+      </p>
+    </section>
+
+    <section aria-labelledby="source">
+      <h2 id="source">Other systems: build from source</h2>
+      <p>
+        The installer is for 64-bit Windows only. Elsewhere, install Rust and a
+        Java 17 or later JDK, clone the
+        <a href={release.repo}>compiler repository</a>, and run these once from
+        its folder in PowerShell:
+      </p>
+      <MamCode
+        lang="powershell"
+        code={"cargo build --release\n$env:Path = \"$(Join-Path $PWD 'target\\release');$env:Path\"\nmammoth .\\examples\\greet.mam"}
+      />
+      <p>Repeat the <code>PATH</code> line in each new terminal.</p>
+    </section>
+  </div>
+</Base>

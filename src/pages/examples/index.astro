@@ -1,0 +1,53 @@
+---
+import Base from "../../layouts/Base.astro";
+import MamCode from "../../components/MamCode.astro";
+import { examples } from "../../data/examples";
+import { release, url } from "../../site";
+---
+
+<Base
+  title="Examples"
+  section="examples"
+  description="Complete Mammoth programs with their output, ready to download and run."
+>
+  <header class="page-head wrap">
+    <p class="page-kicker">Examples</p>
+    <h1>Programs you can run</h1>
+    <p class="page-lede">
+      Each program is complete, with the output it prints. Download one and run
+      it with <code>mammoth {examples[0].file}</code>.
+    </p>
+  </header>
+
+  <div class="gallery wrap">
+    {
+      examples.map((example) => (
+        <article class="gallery-card" id={example.id} aria-labelledby={`${example.id}-title`}>
+          <div class="gallery-head">
+            <h2 id={`${example.id}-title`}>{example.tab}</h2>
+            <a href={url(`examples/${example.file}`)} download>
+              Download
+            </a>
+          </div>
+          <p>{example.note}</p>
+          <MamCode code={example.code} file={example.file} />
+          <div class="output-block">
+            <span>{example.outputLabel}</span>
+            <pre>{example.output}</pre>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+
+  <section class="wrap more-examples">
+    <h2>More in the compiler repository</h2>
+    <p>
+      The compiler repository has over 50 more programs, from a calculator and
+      an interpreter to Java callbacks and Minecraft Fabric mods.
+    </p>
+    <a class="btn btn-secondary" href={`${release.repo}/tree/main/examples`}>
+      Browse all examples on GitHub
+    </a>
+  </section>
+</Base>

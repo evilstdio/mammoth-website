@@ -1,9 +1,6 @@
 ---
-import "@fontsource-variable/ibm-plex-sans";
-import "@fontsource/barlow-condensed/800.css";
-import "@fontsource/ibm-plex-mono/400.css";
-import "../styles/global.css";
-
+import Base from "../layouts/Base.astro";
+import { release, url } from "../site";
 import { examples } from "../data/examples";
 
 // The site is served under a sub-path on GitHub Pages; build links from it.
@@ -20,7 +17,7 @@ const strata = [
   },
   {
     name: "Mammoth compiler",
-    detail: "Built from source with Rust",
+    detail: "Written in Rust",
     color: "#94693f",
     tone: "on-dark",
     edge: "M0 14 L170 30 L330 16 L510 32 L680 12 L850 28 L1020 14 L1200 32 L1370 16 L1600 30",
@@ -72,49 +69,7 @@ const highlight = (code: string) =>
     });
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#a9d3ea" />
-    <meta
-      name="description"
-      content="Mammoth is a beginner-friendly, statically typed language for the JVM. Clear syntax. Java interoperability. More room for your ideas."
-    />
-    <link rel="icon" type="image/svg+xml" href={base + "brand/mammoth.svg"} />
-    <title>Mammoth Programming Language</title>
-  </head>
-  <body>
-    <a class="skip-link" href="#main">
-      Skip to content
-    </a>
-
-    <header class="nav">
-      <div class="nav-inner">
-        <a class="brand" href="#" aria-label="Mammoth home">
-          <img src={base + "brand/mammoth.svg"} width="40" height="40" alt="" />
-          <span>Mammoth</span>
-        </a>
-        <button
-          class="menu-toggle"
-          aria-expanded="false"
-          aria-controls="navigation"
-        >
-          Menu
-        </button>
-        <nav id="navigation" aria-label="Main navigation">
-          <a href="#examples">Examples</a>
-          <a href="#language">Language</a>
-          <a href="#bedrock">The JVM</a>
-          <button class="btn btn-primary btn-small" data-setup>
-            Get started
-          </button>
-        </nav>
-      </div>
-    </header>
-
-    <main id="main">
+<Base>
       <section class="hero" aria-labelledby="hero-title">
         <svg
           class="scene"
@@ -247,11 +202,11 @@ const highlight = (code: string) =>
           </h1>
           <p class="intro">Clear syntax. Static types. Java interop.</p>
           <div class="hero-actions">
-            <button class="btn btn-primary" data-setup>
+            <a class="btn btn-primary" href={url("install/")}>
               Get started
-            </button>
-            <a class="btn btn-secondary" href="#examples">
-              Meet the language
+            </a>
+            <a class="btn btn-secondary" href={url("tour/")}>
+              Take the tour
             </a>
           </div>
         </div>
@@ -401,8 +356,8 @@ const highlight = (code: string) =>
               Compile directly to JVM bytecode. Use Java classes and existing
               JARs, with a whole ecosystem to explore.
             </p>
-            <a class="btn btn-secondary" href="#examples" data-tab="java">
-              See Java interop
+            <a class="btn btn-secondary" href={url("docs/using-java/")}>
+              Read about Java interop
             </a>
           </div>
         </div>
@@ -461,12 +416,13 @@ const highlight = (code: string) =>
               <br />
               your next idea.
             </h2>
-            <button class="btn btn-primary" data-setup>
+            <a class="btn btn-primary" href={url("install/")}>
               Start with Mammoth
-            </button>
+            </a>
             <p>
-              Mammoth is in active development. Today you build it from source
-              with Rust and Java 17 or newer.
+              Mammoth {release.version} is an {release.status.toLowerCase()}.
+              The Windows installer includes its own Java, so there is nothing
+              else to set up.
             </p>
           </div>
           <img
@@ -479,51 +435,6 @@ const highlight = (code: string) =>
           />
         </div>
       </section>
-    </main>
-
-    <footer>
-      <div class="wrap footer-inner">
-        <span class="footer-name">Mammoth</span>
-        <span>A language for the curious.</span>
-        <a class="to-top" href="#main">
-          Back to the surface ↑
-        </a>
-      </div>
-    </footer>
-
-    <dialog id="setup-dialog" aria-labelledby="setup-title">
-      <button class="dialog-close" aria-label="Close setup guide">
-        ×
-      </button>
-      <p class="eyebrow">Let’s get you started</p>
-      <h2 id="setup-title">Your first Mammoth program.</h2>
-      <p>
-        The current compiler is built from source. You’ll need{" "}
-        <strong>Rust</strong>, <strong>Java 17 or newer</strong>, and a local
-        copy of the Mammoth compiler project.
-      </p>
-      <ol>
-        <li>
-          In the compiler project, build a release:
-          <pre><code>cargo build --release</code></pre>
-        </li>
-        <li>
-          Save this example as <code>hello.mam</code>:
-          <pre><code>{examples[0].code}</code></pre>
-          <a href={base + "examples/hello.mam"} download>
-            Download the example ↓
-          </a>
-        </li>
-        <li>
-          Run it from the compiler project (PowerShell):
-          <pre><code>.\target\release\mammoth.exe .\hello.mam</code></pre>
-        </li>
-      </ol>
-      <p class="setup-note">
-        Prebuilt compiler downloads and full website documentation are still to
-        come.
-      </p>
-    </dialog>
 
     <div
       class="sr-only"
@@ -600,40 +511,5 @@ const highlight = (code: string) =>
         }
       });
 
-      const menu = document.querySelector<HTMLButtonElement>(".menu-toggle")!;
-      const closeMenu = () => menu.setAttribute("aria-expanded", "false");
-      menu.addEventListener("click", () =>
-        menu.setAttribute(
-          "aria-expanded",
-          String(menu.getAttribute("aria-expanded") !== "true"),
-        ),
-      );
-      document
-        .querySelectorAll("#navigation a, #navigation button")
-        .forEach((item) => item.addEventListener("click", closeMenu));
-
-      const dialog =
-        document.querySelector<HTMLDialogElement>("#setup-dialog")!;
-      document
-        .querySelectorAll<HTMLButtonElement>("[data-setup]")
-        .forEach((button) =>
-          button.addEventListener("click", () => dialog.showModal()),
-        );
-      document
-        .querySelector(".dialog-close")!
-        .addEventListener("click", () => dialog.close());
-      dialog.addEventListener("click", (event) => {
-        if (event.target === dialog) {
-          const rect = dialog.getBoundingClientRect();
-          if (
-            event.clientX < rect.left ||
-            event.clientX > rect.right ||
-            event.clientY < rect.top ||
-            event.clientY > rect.bottom
-          )
-            dialog.close();
-        }
-      });
     </script>
-  </body>
-</html>
+</Base>

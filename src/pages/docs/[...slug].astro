@@ -1,0 +1,134 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { release, url } from "../../site";
+
+export async function getStaticPaths() {
+  const pages = (await getCollection("docs")).sort((a, b) => a.data.order - b.data.order);
+  return pages.map((entry, i) => ({
+    // The overview is served at /docs/ itself.
+    params: { slug: entry.id === "overview" ? undefined : entry.id },
+    props: { entry, pages, prev: pages[i - 1], next: pages[i + 1] },
+  }));
+}
+
+const { entry, pages, prev, next } = Astro.props;
+const { Content, headings } = await render(entry);
+
+const href = (id: string) => url(id === "overview" ? "docs/" : `docs/${id}/`);
+const groups = [...new Set(pages.map((page) => page.data.group))].map((name) => ({
+  name,
+  pages: pages.filter((page) => page.data.group === name),
+}));
+const onThisPage = headings.filter((h) => h.depth === 2);
+const isOverview = entry.id === "overview";
+---
+
+<Base title={isOverview ? "Documentation" : entry.data.title} section="docs">
+  <div class="docs wrap">
+    <aside class="docs-sidebar" aria-label="Documentation">
+      <details class="docs-menu" open>
+        <summary>Documentation</summary>
+        {
+          groups.map((group) => (
+            <div class="docs-group">
+              <p class="docs-group-name">{group.name}</p>
+              <ul>
+                {group.pages.map((page) => (
+                  <li>
+                    <a
+                      href={href(page.id)}
+                      aria-current={page.id === entry.id ? "page" : undefined}
+                    >
+                      {page.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </details>
+    </aside>
+
+    <article class="docs-main">
+      <p class="docs-kicker">{entry.data.group}</p>
+      <h1>{isOverview ? "Mammoth documentation" : entry.data.title}</h1>
+      <div class="prose">
+        <Content />
+      </div>
+
+      {
+        isOverview && (
+          <section class="docs-contents" aria-labelledby="contents-title">
+            <h2 id="contents-title">Contents</h2>
+            <div class="docs-contents-grid">
+              {groups.map((group) => (
+                <div>
+                  <h3>{group.name}</h3>
+                  <ul>
+                    {group.pages
+                      .filter((page) => page.id !== "overview")
+                      .map((page) => (
+                        <li>
+                          <a href={href(page.id)}>{page.data.title}</a>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      }
+
+      <nav class="docs-pager" aria-label="Previous and next page">
+        {
+          prev ? (
+            <a class="pager-prev" href={href(prev.id)}>
+              <span>Previous</span>
+              {prev.data.title}
+            </a>
+          ) : (
+            <span />
+          )
+        }
+        {
+          next && (
+            <a class="pager-next" href={href(next.id)}>
+              <span>Next</span>
+              {next.data.title}
+            </a>
+          )
+        }
+      </nav>
+      <p class="docs-source">
+        These pages are generated from the
+        <a href={`${release.repo}/blob/main/README.md`}>compiler README</a>
+        for Mammoth {release.version}.
+      </p>
+    </article>
+
+    {
+      onThisPage.length > 1 && (
+        <aside class="docs-toc" aria-labelledby="toc-title">
+          <p id="toc-title">On this page</p>
+          <ul>
+            {onThisPage.map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+  </div>
+
+  <script>
+    // On small screens the page list starts collapsed above the content.
+    if (matchMedia("(max-width: 900px)").matches) {
+      document.querySelector(".docs-menu")?.removeAttribute("open");
+    }
+  </script>
+</Base>

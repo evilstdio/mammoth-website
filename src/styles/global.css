@@ -148,7 +148,7 @@ ul {
   height: 40px;
 }
 
-nav {
+#navigation {
   flex: 1;
   display: flex;
   align-items: center;
@@ -157,13 +157,13 @@ nav {
   font-weight: 500;
 }
 
-nav > a:hover {
+#navigation > a:hover {
   text-decoration: underline;
   text-decoration-thickness: 2px;
   text-underline-offset: 5px;
 }
 
-nav > .btn {
+#navigation > .btn {
   margin-left: auto;
 }
 
@@ -972,7 +972,7 @@ dialog .setup-note {
     display: block;
   }
 
-  nav {
+  #navigation {
     display: none;
     position: absolute;
     top: 65px;
@@ -987,17 +987,17 @@ dialog .setup-note {
     font-size: 18px;
   }
 
-  nav > a {
+  #navigation > a {
     padding-block: 12px;
   }
 
-  nav .btn {
+  #navigation .btn {
     margin: 10px 0 0;
     padding-block: 11px;
     font-size: 18px;
   }
 
-  .menu-toggle[aria-expanded="true"] + nav {
+  .menu-toggle[aria-expanded="true"] + #navigation {
     display: flex;
   }
 

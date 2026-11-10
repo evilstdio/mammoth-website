@@ -1,0 +1,156 @@
+---
+import Base from "../../layouts/Base.astro";
+import MamCode from "../../components/MamCode.astro";
+import { examples } from "../../data/examples";
+import { url } from "../../site";
+
+// Each stop pairs one example program with the ideas it shows.
+// The ideas restate the compiler README; each links to the full docs page.
+const stops = [
+  {
+    id: "hello",
+    title: "Functions, text and loops",
+    ideas: [
+      "<code>fun</code> declares a function. Parameters always say their type, as in <code>name: Text</code>.",
+      "In text, <code>{name}</code> inserts a value, and <code>{price * 2}</code> inserts the result of any expression.",
+      "<code>for … in</code> walks through a list. The loop variable only exists inside the loop.",
+    ],
+    doc: { label: "Mutable variables and loops", path: "docs/mutable-variables-and-loops/" },
+  },
+  {
+    id: "functions",
+    title: "Default and named arguments",
+    ideas: [
+      "Add a result type after the parameter list, such as <code>: Int</code>, when a function gives back a value.",
+      "A parameter can have a default, so callers can leave it out.",
+      "Name an argument, as in <code>percent = 25</code>, to make a call read clearly. Arguments run in the order you write them.",
+    ],
+    doc: { label: "Writing less code", path: "docs/writing-less-code/#default-and-named-arguments" },
+  },
+  {
+    id: "collections",
+    title: "Working with collections",
+    ideas: [
+      "Lists come with operations such as <code>filter</code>, <code>map</code>, <code>sorted</code> and <code>joinToString</code>. Each returns a new list.",
+      "A lambda goes in braces. When it takes a single parameter, you can call it <code>it</code>.",
+      "When a call's last argument is a lambda, it can follow the call, as in <code>.filter { it >= 70 }</code>.",
+    ],
+    doc: { label: "Functions as values", path: "docs/functions-as-values/" },
+  },
+  {
+    id: "nulls",
+    title: "Null safety",
+    ideas: [
+      "Add <code>?</code> to a type when a value can be missing, such as <code>Text?</code>.",
+      "<code>?.</code> calls a method only when the value is present. Otherwise the result is null.",
+      "<code>?:</code> gives a fallback for a missing value.",
+    ],
+    doc: { label: "Nullable values", path: "docs/nullable-values/" },
+  },
+  {
+    id: "classes",
+    title: "Classes and interfaces",
+    ideas: [
+      "An <code>interface</code> declares the methods a class must provide. The class lists it after <code>implements</code>.",
+      "Put <code>let</code> or <code>var</code> before a constructor parameter to make it a field.",
+      "Use the interface as a type to work with any class that implements it. <code>override</code> has the compiler check that a method really replaces one.",
+    ],
+    doc: { label: "Classes and objects", path: "docs/classes-and-objects/" },
+  },
+  {
+    id: "branching",
+    title: "Choosing with when",
+    ideas: [
+      "<code>when</code> picks the first branch whose condition matches. A branch can list values, check a range with <code>in</code>, or check a type with <code>is</code>.",
+      "<code>when</code> and <code>if</code> can produce a value. When they do, an <code>else</code> branch is required.",
+    ],
+    doc: { label: "Choosing with when", path: "docs/choosing-with-when/" },
+  },
+  {
+    id: "java",
+    title: "Using Java",
+    ideas: [
+      "Mammoth reads the JDK and the JARs on your <code>CLASSPATH</code> directly, so you use Java classes without writing any declarations.",
+      "Import a class by its full name. Classes in <code>java.lang</code>, such as <code>Math</code>, are always available.",
+      "Call a constructor by the class name and static methods on the class, as in <code>LocalDate.of(…)</code>.",
+    ],
+    doc: { label: "Using Java", path: "docs/using-java/" },
+  },
+  {
+    id: "json",
+    title: "Dictionaries and JSON",
+    ideas: [
+      "A dictionary literal such as <code>{\"name\": \"Mammoth\"}</code> builds a map. Entries keep their insertion order.",
+      "<code>Json.parse</code> and <code>Json.stringify</code> come with Mammoth, so there is nothing to install.",
+      "<code>v[\"key\"]</code> throws if the key is missing, while <code>v.find(\"key\")</code> gives <code>null</code>.",
+    ],
+    doc: { label: "JSON in mammoth.requests", path: "docs/requests/#json" },
+  },
+].map((stop) => ({ ...stop, example: examples.find((e) => e.id === stop.id)! }));
+---
+
+<Base
+  title="Tour"
+  section="tour"
+  description="A guided tour of the Mammoth language in eight short programs."
+>
+  <header class="page-head wrap">
+    <p class="page-kicker">Language tour</p>
+    <h1>Mammoth in eight programs</h1>
+    <p class="page-lede">
+      Each stop is a complete program with the output it prints. Read them in
+      order, or jump to the idea you need. Every stop links to the full
+      documentation.
+    </p>
+  </header>
+
+  <div class="tour wrap">
+    <nav class="tour-index" aria-label="Tour stops">
+      <ol>
+        {
+          stops.map((stop) => (
+            <li>
+              <a href={`#${stop.id}`}>{stop.title}</a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <div class="tour-stops">
+      {
+        stops.map((stop, i) => (
+          <section class="tour-stop" id={stop.id} aria-labelledby={`${stop.id}-title`}>
+            <p class="tour-step">
+              {String(i + 1).padStart(2, "0")} / {String(stops.length).padStart(2, "0")}
+            </p>
+            <h2 id={`${stop.id}-title`}>{stop.title}</h2>
+            <p class="tour-note">{stop.example.note}</p>
+            <ul class="tour-ideas">
+              {stop.ideas.map((idea) => (
+                <li set:html={idea} />
+              ))}
+            </ul>
+            <MamCode code={stop.example.code} file={stop.example.file} />
+            <div class="output-block">
+              <span>{stop.example.outputLabel}</span>
+              <pre>{stop.example.output}</pre>
+            </div>
+            <p class="tour-links">
+              <a href={url(stop.doc.path)}>Read more: {stop.doc.label} →</a>
+              <a href={url(`examples/${stop.example.file}`)} download>
+                Download {stop.example.file}
+              </a>
+            </p>
+          </section>
+        ))
+      }
+
+      <section class="tour-end">
+        <h2>Ready to try it?</h2>
+        <p>Install Mammoth and run any of these with <code>mammoth file.mam</code>.</p>
+        <a class="btn btn-primary" href={url("install/")}>Install Mammoth</a>
+      </section>
+    </div>
+  </div>
+</Base>

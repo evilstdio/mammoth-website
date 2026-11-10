@@ -1,0 +1,134 @@
+---
+import "@fontsource-variable/ibm-plex-sans";
+import "@fontsource/barlow-condensed/800.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "../styles/global.css";
+import "../styles/pages.css";
+import { release, url } from "../site";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Which top-level section this page belongs to, for the active link. */
+  section?: "tour" | "docs" | "examples" | "install";
+}
+
+const {
+  title,
+  description = "Mammoth is a beginner-friendly, statically typed language for the JVM. Clear syntax. Java interoperability. More room for your ideas.",
+  section,
+} = Astro.props;
+
+const links = [
+  { id: "tour", label: "Tour", href: url("tour/") },
+  { id: "docs", label: "Docs", href: url("docs/") },
+  { id: "examples", label: "Examples", href: url("examples/") },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7fbfe" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={url("brand/mammoth.svg")} />
+    <title>{title ? `${title} · Mammoth` : "Mammoth Programming Language"}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href={url()} aria-label="Mammoth home">
+          <img src={url("brand/mammoth.svg")} width="40" height="40" alt="" />
+          <span>Mammoth</span>
+        </a>
+        <button class="menu-toggle" aria-expanded="false" aria-controls="navigation">
+          Menu
+        </button>
+        <nav id="navigation" aria-label="Main navigation">
+          {
+            links.map((link) => (
+              <a href={link.href} aria-current={section === link.id ? "page" : undefined}>
+                {link.label}
+              </a>
+            ))
+          }
+          <a href={release.repo}>GitHub</a>
+          <a
+            class="btn btn-primary btn-small"
+            href={url("install/")}
+            aria-current={section === "install" ? "page" : undefined}
+          >
+            Get started
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer>
+      <div class="wrap footer-inner">
+        <div class="footer-brand">
+          <span class="footer-name">Mammoth</span>
+          <span>A language for the curious.</span>
+        </div>
+        <nav class="footer-links" aria-label="Footer">
+          <a href={url("install/")}>Install</a>
+          <a href={url("tour/")}>Tour</a>
+          <a href={url("docs/")}>Docs</a>
+          <a href={url("examples/")}>Examples</a>
+          <a href={release.repo}>GitHub</a>
+          <a href={release.page}>Release {release.version}</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script>
+      const menu = document.querySelector<HTMLButtonElement>(".menu-toggle")!;
+      menu.addEventListener("click", () =>
+        menu.setAttribute(
+          "aria-expanded",
+          String(menu.getAttribute("aria-expanded") !== "true"),
+        ),
+      );
+      document
+        .querySelectorAll("#navigation a")
+        .forEach((item) =>
+          item.addEventListener("click", () => menu.setAttribute("aria-expanded", "false")),
+        );
+
+      // Code blocks get a Copy button: marked blocks, and every block in docs prose.
+      document.querySelectorAll<HTMLPreElement>(".prose pre").forEach((pre) => {
+        if (pre.parentElement?.hasAttribute("data-copy")) return;
+        const wrap = document.createElement("div");
+        wrap.setAttribute("data-copy", "");
+        pre.replaceWith(wrap);
+        wrap.append(pre);
+      });
+      document.querySelectorAll<HTMLElement>("[data-copy]").forEach((block) => {
+        const pre = block.querySelector("pre");
+        if (!pre) return;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "copy-chip";
+        button.textContent = "Copy";
+        button.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(pre.innerText.replace(/\n$/, ""));
+            button.textContent = "Copied ✓";
+          } catch {
+            button.textContent = "Select to copy";
+          }
+          setTimeout(() => (button.textContent = "Copy"), 2000);
+        });
+        block.append(button);
+      });
+    </script>
+  </body>
+</html>

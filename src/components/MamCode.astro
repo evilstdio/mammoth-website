@@ -1,0 +1,19 @@
+---
+// A highlighted, copyable code block. Defaults to Mammoth code.
+import { Code } from "astro:components";
+import { mammothLang, mammothTheme } from "../shiki/mammoth.mjs";
+
+interface Props {
+  code: string;
+  lang?: "mammoth" | "powershell" | "text";
+  /** Optional file name shown above the code. */
+  file?: string;
+}
+
+const { code, lang = "mammoth", file } = Astro.props;
+---
+
+<div class="code-block" data-copy>
+  {file && <div class="code-file">{file}</div>}
+  <Code code={code} lang={lang === "mammoth" ? mammothLang : lang} theme={mammothTheme} />
+</div>
