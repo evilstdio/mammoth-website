@@ -1,0 +1,24 @@
+# Dependencies and build output
+node_modules/
+dist/
+.astro/
+
+# Local caches and scratch output
+.npm-cache/
+.verification/
+
+# Editor and tool settings
+.claude/
+.vscode/
+.idea/
+
+# Environment files (may hold secrets)
+.env
+.env.*
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

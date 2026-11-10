@@ -1,0 +1,636 @@
+---
+import "@fontsource-variable/ibm-plex-sans";
+import "@fontsource/barlow-condensed/800.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "../styles/global.css";
+
+import { examples } from "../data/examples";
+
+const strata = [
+  {
+    name: "hello.mam",
+    mono: true,
+    detail: "What you write",
+    color: "#c2a077",
+    tone: "on-light",
+    edge: "M0 26 L140 14 L290 30 L430 12 L600 28 L760 16 L930 32 L1090 12 L1260 28 L1430 14 L1600 24",
+  },
+  {
+    name: "Mammoth compiler",
+    detail: "Built from source with Rust",
+    color: "#94693f",
+    tone: "on-dark",
+    edge: "M0 14 L170 30 L330 16 L510 32 L680 12 L850 28 L1020 14 L1200 32 L1370 16 L1600 30",
+  },
+  {
+    name: "JVM bytecode",
+    detail: "Compiled directly from Mammoth",
+    color: "#684a33",
+    tone: "on-dark",
+    edge: "M0 30 L150 16 L320 32 L480 14 L670 30 L840 12 L1010 28 L1180 14 L1380 32 L1600 16",
+  },
+  {
+    name: "The JVM",
+    detail: "",
+    color: "#3c2d26",
+    tone: "on-dark",
+    stones: ["Your program", "Java classes", "Existing JARs"],
+    edge: "M0 16 L190 32 L360 14 L540 30 L710 16 L900 32 L1060 12 L1250 30 L1420 14 L1600 28",
+  },
+];
+
+const keywords =
+  /^(fun|let|var|for|in|return|import|interface|class|implements|override|when|else|null|true|false)$/;
+const types =
+  /^(Text|Int|List|Animal|Mammoth|LocalDate|DateTimeFormatter|Json)$/;
+
+const highlight = (code: string) =>
+  code
+    .split(
+      /("[^"\n]*"|\b(?:fun|let|var|for|in|return|import|interface|class|implements|override|when|else|null|true|false)\b|\b(?:Text|Int|List|Animal|Mammoth|LocalDate|DateTimeFormatter|Json)\b|\b\d+\b|\b[a-zA-Z_]\w*(?=\())/g,
+    )
+    .flatMap((part) => {
+      if (part.startsWith('"')) {
+        return part.split(/(\{[^}]*\})/g).map((piece) => ({
+          text: piece,
+          kind: piece.startsWith("{") ? "interp" : "string",
+        }));
+      }
+      const kind = keywords.test(part)
+        ? "keyword"
+        : types.test(part)
+          ? "type"
+          : /^\d+$/.test(part)
+            ? "number"
+            : /^[a-zA-Z_]\w*$/.test(part) && code.includes(part + "(")
+              ? "call"
+              : "";
+      return [{ text: part, kind }];
+    });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#a9d3ea" />
+    <meta
+      name="description"
+      content="Mammoth is a beginner-friendly, statically typed language for the JVM. Clear syntax. Java interoperability. More room for your ideas."
+    />
+    <link rel="icon" type="image/svg+xml" href="/brand/mammoth.svg" />
+    <title>Mammoth Programming Language</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+
+    <header class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="#" aria-label="Mammoth home">
+          <img src="/brand/mammoth.svg" width="40" height="40" alt="" />
+          <span>Mammoth</span>
+        </a>
+        <button
+          class="menu-toggle"
+          aria-expanded="false"
+          aria-controls="navigation"
+        >
+          Menu
+        </button>
+        <nav id="navigation" aria-label="Main navigation">
+          <a href="#examples">Examples</a>
+          <a href="#language">Language</a>
+          <a href="#bedrock">The JVM</a>
+          <button class="btn btn-primary btn-small" data-setup>
+            Get started
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <svg
+          class="scene"
+          viewBox="0 0 1600 900"
+          role="img"
+          aria-label="Mammoth’s white, shaggy mascot standing on a snowy ridge in front of glaciers"
+        >
+          <defs>
+            <filter id="wobble" x="-5%" y="-5%" width="110%" height="110%">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.014"
+                numOctaves="2"
+                seed="4"
+              ></feTurbulence>
+              <feDisplacementMap
+                in="SourceGraphic"
+                scale="9"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              ></feDisplacementMap>
+            </filter>
+          </defs>
+
+          <g class="sun">
+            <circle cx="1040" cy="335" r="74" fill="#fff4cf"></circle>
+            <circle
+              cx="1040"
+              cy="335"
+              r="118"
+              fill="#fff4cf"
+              opacity="0.3"
+            ></circle>
+          </g>
+
+          <g filter="url(#wobble)">
+            <path
+              fill="#c6dfef"
+              d="M-30 650L120 592 230 628 360 566 470 612 600 548 740 604 860 512 980 566 1100 420 1220 486 1340 340 1470 446 1630 384V920H-30Z"
+            ></path>
+
+            <g class="peak">
+              <path
+                class="rock"
+                fill="#8cbbd9"
+                d="M1300 214L809 860H1791Z"
+              ></path>
+              <path
+                fill="#669cc2"
+                d="M1300 214L1410 424 1360 524 1450 664 1500 860H1791Z"
+              ></path>
+              <path
+                class="rock"
+                fill="#fff"
+                d="M1300 214L1194 354 1238 336 1270 396 1312 349 1352 409 1385 356 1413 364Z"
+              ></path>
+            </g>
+            <g class="peak">
+              <path
+                class="rock"
+                fill="#a6cde3"
+                d="M1000 352L538 860H1462Z"
+              ></path>
+              <path
+                fill="#7aaccd"
+                d="M1000 352L1060 472 1030 562 1110 692 1160 860H1462Z"
+              ></path>
+              <path
+                class="rock"
+                fill="#fff"
+                d="M1000 352L909 452 945 440 975 492 1010 447 1045 502 1070 457 1091 452Z"
+              ></path>
+            </g>
+            <g class="peak" transform="translate(210 74)">
+              <path
+                class="rock"
+                fill="#a6cde3"
+                d="M420 562L200 762H650Z"
+              ></path>
+              <path
+                fill="#7aaccd"
+                d="M420 562L458 642 440 692 490 762H650Z"
+              ></path>
+              <path
+                class="rock"
+                fill="#fff"
+                d="M420 562L354 622 382 614 405 647 432 617 462 652 489 622Z"
+              ></path>
+            </g>
+
+            <path
+              class="rock"
+              fill="#deedf6"
+              d="M-30 748C200 696 420 724 640 748 820 768 1000 724 1200 738 1360 748 1500 718 1630 732V920H-30Z"
+            ></path>
+          </g>
+
+          <image
+            href="/brand/mammoth.svg"
+            x="965"
+            y="262"
+            width="620"
+            height="620"
+          />
+
+          <g filter="url(#wobble)">
+            <path
+              fill="#f7fbfe"
+              d="M-30 858C200 806 430 866 680 852 860 842 980 818 1180 818 1340 818 1470 826 1630 800V940H-30Z"
+            ></path>
+            <path
+              fill="#c3dcec"
+              d="M1130 836C1240 824 1480 824 1590 836 1480 854 1240 854 1130 836Z"
+            ></path>
+            <path
+              class="rock"
+              fill="none"
+              d="M-30 858C200 806 430 866 680 852 860 842 980 818 1180 818 1340 818 1470 826 1630 800"
+            ></path>
+          </g>
+        </svg>
+
+        <div class="snow" aria-hidden="true"></div>
+
+        <div class="wrap hero-copy">
+          <h1 id="hero-title">
+            Big ideas.
+            <br />
+            Clear code.
+          </h1>
+          <p class="intro">Clear syntax. Static types. Java interop.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" data-setup>
+              Get started
+            </button>
+            <a class="btn btn-secondary" href="#examples">
+              Meet the language
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div class="ice">
+        <svg
+          class="cracks"
+          viewBox="0 1060 1600 400"
+          preserveAspectRatio="xMidYMid slice"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <g fill="none" stroke="#fff" stroke-width="2" opacity="0.55">
+            <path d="M1610 1180L1500 1160 1440 1218 1340 1200 1270 1260M1440 1218L1462 1310"></path>
+            <path d="M-10 1290L90 1312 150 1270 260 1300 300 1370"></path>
+          </g>
+          <g fill="#fff" opacity="0.4">
+            <circle cx="700" cy="1380" r="5"></circle>
+            <circle cx="736" cy="1410" r="3"></circle>
+            <circle cx="1100" cy="1320" r="4"></circle>
+          </g>
+        </svg>
+
+        <section
+          class="wrap examples"
+          id="examples"
+          aria-labelledby="examples-title"
+        >
+          <div class="examples-head">
+            <div>
+              <h2 id="examples-title">Easy to read. Yours to write.</h2>
+            </div>
+          </div>
+
+          <div class="code-panel">
+            <div class="code-bar">
+              <div
+                class="tabs"
+                role="tablist"
+                aria-label="Code examples"
+                aria-orientation="horizontal"
+              >
+                {examples.map((example, i) => (
+                  <button
+                    id={"tab-" + example.id}
+                    role="tab"
+                    aria-selected={i === 0 ? "true" : "false"}
+                    aria-controls={"panel-" + example.id}
+                    tabindex={i === 0 ? 0 : -1}
+                    data-tab-id={example.id}
+                  >
+                    {example.tab}
+                  </button>
+                ))}
+              </div>
+              <div class="code-actions">
+                <span id="active-file">{examples[0].file}</span>
+                <button class="copy-button" id="copy-code">
+                  Copy
+                </button>
+              </div>
+            </div>
+            {examples.map((example, i) => (
+              <div
+                class="code-body"
+                id={"panel-" + example.id}
+                role="tabpanel"
+                aria-labelledby={"tab-" + example.id}
+                hidden={i !== 0}
+                data-code={example.code}
+                data-file={example.file}
+              >
+                <div class="code-lines">
+                  <div class="gutter" aria-hidden="true">
+                    {example.code.split("\n").map((_, n) => (
+                      <span>{n + 1}</span>
+                    ))}
+                  </div>
+                  <pre
+                    class="code-area"
+                    tabindex="0"
+                  ><code>{highlight(example.code).map((token) => <span class={token.kind}>{token.text}</span>)}</code></pre>
+                </div>
+                <div class="output">
+                  <span class="output-label">{example.outputLabel}</span>
+                  <pre>{example.output}</pre>
+                  <p>{example.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section
+          class="wrap friendly"
+          id="language"
+          aria-labelledby="language-title"
+        >
+          <h2 id="language-title">A friendly language.</h2>
+          <div class="points">
+            <article>
+              <h3>Clarity comes first.</h3>
+              <p>
+                Readable syntax, expressive functions, and type inference. Code
+                that feels approachable from your very first file.
+              </p>
+            </article>
+            <article>
+              <h3>Confidence, built in.</h3>
+              <p>
+                Static typing checks your code before it runs. Let Mammoth infer
+                the simple things, and make your intent explicit where it
+                matters.
+              </p>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <section class="bedrock" id="bedrock" aria-labelledby="bedrock-title">
+        <svg
+          class="rock-edge"
+          viewBox="0 0 1600 90"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            fill="#4a3a31"
+            d="M0 60L90 38 170 52 260 22 350 48 470 30 560 58 680 26 790 44 900 18 1010 50 1120 28 1240 56 1350 24 1480 46 1600 30V90H0Z"
+          ></path>
+          <path
+            fill="none"
+            stroke="#10233a"
+            stroke-width="4"
+            vector-effect="non-scaling-stroke"
+            d="M0 60L90 38 170 52 260 22 350 48 470 30 560 58 680 26 790 44 900 18 1010 50 1120 28 1240 56 1350 24 1480 46 1600 30"
+          ></path>
+        </svg>
+
+        <div class="wrap bedrock-intro">
+          <h2 id="bedrock-title">Serious foundations.</h2>
+          <div>
+            <h3>At home on the JVM.</h3>
+            <p>
+              Compile directly to JVM bytecode. Use Java classes and existing
+              JARs, with a whole ecosystem to explore.
+            </p>
+            <a class="btn btn-secondary" href="#examples" data-tab="java">
+              See Java interop
+            </a>
+          </div>
+        </div>
+
+        <div class="strata">
+          {strata.map((layer) => (
+            <div class={"stratum " + layer.tone} style={"--c:" + layer.color}>
+              <svg
+                viewBox="0 0 1600 44"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path fill={layer.color} d={layer.edge + "V44H0Z"} />
+                <path
+                  fill="none"
+                  stroke="#10233a"
+                  stroke-width="4"
+                  vector-effect="non-scaling-stroke"
+                  d={layer.edge}
+                />
+              </svg>
+              <div class="wrap stratum-row">
+                <strong class={layer.mono ? "mono" : ""}>{layer.name}</strong>
+                {layer.detail && <span>{layer.detail}</span>}
+                {layer.stones && (
+                  <ul>
+                    {layer.stones.map((stone) => (
+                      <li>{stone}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="cave" id="start" aria-labelledby="start-title">
+        <svg
+          class="stalactites"
+          viewBox="0 0 1600 120"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            fill="#3c2d26"
+            d="M0 0H1600V26L1540 34 1500 112 1458 30 1380 38 1340 76 1296 30 1180 34 1130 104 1086 28 960 36 920 66 880 30 760 32 716 118 668 30 540 38 500 72 456 28 340 34 296 98 252 30 130 36 92 64 54 28 0 34Z"
+          ></path>
+        </svg>
+        <div class="wrap cave-inner">
+          <div>
+            <h2 id="start-title">
+              Make room for
+              <br />
+              your next idea.
+            </h2>
+            <button class="btn btn-primary" data-setup>
+              Start with Mammoth
+            </button>
+            <p>
+              Mammoth is in active development. Today you build it from source
+              with Rust and Java 17 or newer.
+            </p>
+          </div>
+          <img
+            class="painting"
+            src="/brand/mammoth.svg"
+            alt=""
+            width="1254"
+            height="1254"
+            loading="lazy"
+          />
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap footer-inner">
+        <span class="footer-name">Mammoth</span>
+        <span>A language for the curious.</span>
+        <a class="to-top" href="#main">
+          Back to the surface ↑
+        </a>
+      </div>
+    </footer>
+
+    <dialog id="setup-dialog" aria-labelledby="setup-title">
+      <button class="dialog-close" aria-label="Close setup guide">
+        ×
+      </button>
+      <p class="eyebrow">Let’s get you started</p>
+      <h2 id="setup-title">Your first Mammoth program.</h2>
+      <p>
+        The current compiler is built from source. You’ll need{" "}
+        <strong>Rust</strong>, <strong>Java 17 or newer</strong>, and a local
+        copy of the Mammoth compiler project.
+      </p>
+      <ol>
+        <li>
+          In the compiler project, build a release:
+          <pre><code>cargo build --release</code></pre>
+        </li>
+        <li>
+          Save this example as <code>hello.mam</code>:
+          <pre><code>{examples[0].code}</code></pre>
+          <a href="/examples/hello.mam" download>
+            Download the example ↓
+          </a>
+        </li>
+        <li>
+          Run it from the compiler project (PowerShell):
+          <pre><code>.\target\release\mammoth.exe .\hello.mam</code></pre>
+        </li>
+      </ol>
+      <p class="setup-note">
+        Prebuilt compiler downloads and full website documentation are still to
+        come.
+      </p>
+    </dialog>
+
+    <div
+      class="sr-only"
+      id="copy-status"
+      role="status"
+      aria-live="polite"
+    ></div>
+
+    <script>
+      const tabs = Array.from(
+        document.querySelectorAll<HTMLButtonElement>('[role="tab"]'),
+      );
+      const activeFile = document.getElementById("active-file")!;
+      const copyStatus = document.getElementById("copy-status")!;
+
+      function selectTab(tab: HTMLButtonElement) {
+        tabs.forEach((item) => {
+          const selected = item === tab;
+          item.setAttribute("aria-selected", String(selected));
+          item.tabIndex = selected ? 0 : -1;
+          const panel = document.getElementById(
+            item.getAttribute("aria-controls")!,
+          )!;
+          panel.hidden = !selected;
+          if (selected) {
+            activeFile.textContent = panel.dataset.file!;
+          }
+        });
+      }
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => selectTab(tab));
+        tab.addEventListener("keydown", (event) => {
+          let next = index;
+          if (event.key === "ArrowDown" || event.key === "ArrowRight")
+            next = (index + 1) % tabs.length;
+          else if (event.key === "ArrowUp" || event.key === "ArrowLeft")
+            next = (index + tabs.length - 1) % tabs.length;
+          else if (event.key === "Home") next = 0;
+          else if (event.key === "End") next = tabs.length - 1;
+          else return;
+          event.preventDefault();
+          selectTab(tabs[next]);
+          tabs[next].focus();
+        });
+      });
+
+      // Links elsewhere on the page can jump to a specific example.
+      document
+        .querySelectorAll<HTMLAnchorElement>("a[data-tab]")
+        .forEach((link) =>
+          link.addEventListener("click", () => {
+            const tab = tabs.find(
+              (item) => item.dataset.tabId === link.dataset.tab,
+            );
+            if (tab) selectTab(tab);
+          }),
+        );
+
+      const copyButton =
+        document.querySelector<HTMLButtonElement>("#copy-code")!;
+      copyButton.addEventListener("click", async () => {
+        const panel = document.querySelector<HTMLElement>(
+          '[role="tabpanel"]:not([hidden])',
+        )!;
+        try {
+          await navigator.clipboard.writeText(panel.dataset.code!);
+          copyButton.textContent = "Copied ✓";
+          copyStatus.textContent = "Code copied to clipboard.";
+          setTimeout(() => (copyButton.textContent = "Copy"), 2000);
+        } catch {
+          copyStatus.textContent =
+            "Could not copy. Select the code and copy it manually.";
+        }
+      });
+
+      const menu = document.querySelector<HTMLButtonElement>(".menu-toggle")!;
+      const closeMenu = () => menu.setAttribute("aria-expanded", "false");
+      menu.addEventListener("click", () =>
+        menu.setAttribute(
+          "aria-expanded",
+          String(menu.getAttribute("aria-expanded") !== "true"),
+        ),
+      );
+      document
+        .querySelectorAll("#navigation a, #navigation button")
+        .forEach((item) => item.addEventListener("click", closeMenu));
+
+      const dialog =
+        document.querySelector<HTMLDialogElement>("#setup-dialog")!;
+      document
+        .querySelectorAll<HTMLButtonElement>("[data-setup]")
+        .forEach((button) =>
+          button.addEventListener("click", () => dialog.showModal()),
+        );
+      document
+        .querySelector(".dialog-close")!
+        .addEventListener("click", () => dialog.close());
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) {
+          const rect = dialog.getBoundingClientRect();
+          if (
+            event.clientX < rect.left ||
+            event.clientX > rect.right ||
+            event.clientY < rect.top ||
+            event.clientY > rect.bottom
+          )
+            dialog.close();
+        }
+      });
+    </script>
+  </body>
+</html>
