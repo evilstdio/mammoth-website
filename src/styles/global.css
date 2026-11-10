@@ -282,7 +282,7 @@ nav > .btn {
   left: 0;
   right: -500px;
   bottom: 0;
-  background: url("/art/snow.svg") 0 0 / 500px 500px;
+  background: url("../assets/snow.svg") 0 0 / 500px 500px;
   animation: fall-near 26s linear infinite;
   will-change: transform;
 }

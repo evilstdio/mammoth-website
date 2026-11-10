@@ -6,6 +6,9 @@ import "../styles/global.css";
 
 import { examples } from "../data/examples";
 
+// The site is served under a sub-path on GitHub Pages; build links from it.
+const base = import.meta.env.BASE_URL;
+
 const strata = [
   {
     name: "hello.mam",
@@ -79,7 +82,7 @@ const highlight = (code: string) =>
       name="description"
       content="Mammoth is a beginner-friendly, statically typed language for the JVM. Clear syntax. Java interoperability. More room for your ideas."
     />
-    <link rel="icon" type="image/svg+xml" href="/brand/mammoth.svg" />
+    <link rel="icon" type="image/svg+xml" href={base + "brand/mammoth.svg"} />
     <title>Mammoth Programming Language</title>
   </head>
   <body>
@@ -90,7 +93,7 @@ const highlight = (code: string) =>
     <header class="nav">
       <div class="nav-inner">
         <a class="brand" href="#" aria-label="Mammoth home">
-          <img src="/brand/mammoth.svg" width="40" height="40" alt="" />
+          <img src={base + "brand/mammoth.svg"} width="40" height="40" alt="" />
           <span>Mammoth</span>
         </a>
         <button
@@ -210,7 +213,7 @@ const highlight = (code: string) =>
           </g>
 
           <image
-            href="/brand/mammoth.svg"
+            href={base + "brand/mammoth.svg"}
             x="965"
             y="262"
             width="620"
@@ -468,7 +471,7 @@ const highlight = (code: string) =>
           </div>
           <img
             class="painting"
-            src="/brand/mammoth.svg"
+            src={base + "brand/mammoth.svg"}
             alt=""
             width="1254"
             height="1254"
@@ -507,7 +510,7 @@ const highlight = (code: string) =>
         <li>
           Save this example as <code>hello.mam</code>:
           <pre><code>{examples[0].code}</code></pre>
-          <a href="/examples/hello.mam" download>
+          <a href={base + "examples/hello.mam"} download>
             Download the example ↓
           </a>
         </li>
